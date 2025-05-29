@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceForge - Personal Brand Voice Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Verdana', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 20s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            left: 70%;
+            animation-delay: 5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            left: 40%;
+            animation-delay: 10s;
+        }
+
+        .shape:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            left: 80%;
+            animation-delay: 15s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            padding: 60px 0;
+            color: white;
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            animation: bounce 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-10px); }
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .emoji-decoration {
+            font-size: 2rem;
+            display: inline-block;
+            animation: wiggle 3s ease-in-out infinite;
+            margin: 0 10px;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transform: translateY(0);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid transparent;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffecd2);
+            background-size: 400% 100%;
+            animation: rainbowBorder 8s linear infinite;
+            background-clip: padding-box;
+            border-image: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffecd2) 1;
+        }
+
+        @keyframes rainbowBorder {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 400% 0%; }
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 3px solid #e1e8ed;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.8);
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            transform: scale(1.02);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 15px 40px rgba(78, 205, 196, 0.6);
+        }
+
+        .results-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .metrics-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-pill {
+            background: rgba(255,255,255,0.8);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #555;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .voice-profile {
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-line;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .generated-content {
+            background: rgba(255,255,255,0.9);
+            padding: 25px;
+            border-radius: 15px;
+            line-height: 1.8;
+            white-space: pre-line;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+        }
+
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .logo {
+                font-size: 3rem;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            .metrics-display {
+                flex-direction: column;
+            }
+        }
+
+        .fun-stats {
+            text-align: center;
+            margin: 60px 0;
+            color: white;
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin: 0 40px;
+            animation: countUp 2s ease-out;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            display: block;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @keyframes countUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <span class="emoji-decoration">🎨</span>
+                VoiceForge
+                <span class="emoji-decoration">✨</span>
+            </div>
+            <div class="tagline">
+                Analyze your writing style • Generate content that sounds authentically YOU
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📝</div>
+                    <div class="card-title">Analyze Your Voice</div>
+                </div>
+                
+                <form id="analysisForm">
+                    <div class="form-group">
+                        <label class="form-label">Paste your writing samples ✍️</label>
+                        <textarea 
+                            class="form-textarea" 
+                            id="writingSamples" 
+                            placeholder="Drop your emails, blog posts, tweets, or any text that represents your unique voice...
+                            Examples: Recent emails you've sent, social media posts, blog articles, text messages, or any writing that sounds like YOU!"
+                        ></textarea>
+                    </div>
+                    <button type="submit" class="btn">🔍 Analyze My Voice</button>
+                </form>
+                
+                <div id="analysisResults" class="results-section">
+                    <h3 style="margin-bottom: 20px; color: #333;">📊 Your Voice Metrics</h3>
+                    <div id="metricsDisplay" class="metrics-display"></div>
+                    
+                    <h3 style="margin-bottom: 15px; color: #333;">🎯 Your Voice Profile</h3>
+                    <div id="voiceProfile" class="voice-profile"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">✨</div>
+                    <div class="card-title">Generate Content</div>
+                </div>
+                
+                <form id="generationForm">
+                    <div class="form-group">
+                        <label class="form-label">What do you want to write about? 💭</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="topic" 
+                            placeholder="e.g., Quarterly team update, Product launch, Weekend plans..."
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Content Type 📋</label>
+                        <select class="form-select" id="contentType">
+                            <option value="email">📧 Email</option>
+                            <option value="tweet">🐦 Tweet</option>
+                            <option value="blog_post">📝 Blog Post</option>
+                            <option value="linkedin_post">💼 LinkedIn Post</option>
+                            <option value="instagram_caption">📸 Instagram Caption</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success" disabled id="generateBtn">
+                        🚀 Generate Content
+                    </button>
+                </form>
+                
+                <div id="generationResults" class="results-section">
+                    <h3 style="margin-bottom: 15px; color: #333;">📄 Your Generated Content</h3>
+                    <div id="generatedContent" class="generated-content"></div>
+                    <button class="copy-btn" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="fun-stats">
+            <div class="stat-item">
+                <span class="stat-number" data-count="50000">0</span>
+                <span class="stat-label">Words Analyzed</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-count="1337">0</span>
+                <span class="stat-label">Voices Forged</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-count="98">0</span>
+                <span class="stat-label">% Accuracy</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentVoiceProfile = '';
+        
+        window.addEventListener('load', () => {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-count'));
+                let current = 0;
+                const increment = target / 100;
+                const timer = setInterval(() => {
+                    current += increment;
+                    counter.textContent = Math.floor(current).toLocaleString();
+                    if (current >= target) {
+                        counter.textContent = target.toLocaleString();
+                        clearInterval(timer);
+                    }
+                }, 20);
+            });
+        });
+        
+        document.getElementById('analysisForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const samples = document.getElementById('writingSamples').value.trim();
+            if (!samples) {
+                alert('🤔 Please provide some writing samples to analyze!');
+                return;
+            }
+            
+            const btn = e.target.querySelector('button');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '🔄 Analyzing...';
+            btn.classList.add('loading');
+            
+            try {
+                const response = await fetch('/api/voice/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ writingSamples: [samples] })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentVoiceProfile = result.voiceProfile;
+                    
+                    const metrics = result.metrics;
+                    document.getElementById('metricsDisplay').innerHTML = `
+                        <div class="metric-pill">📏 ${metrics.averageSentenceLength} words/sentence</div>
+                        <div class="metric-pill">🎨 ${metrics.dominantTone} tone</div>
+                        <div class="metric-pill">📝 ${metrics.punctuationStyle} style</div>
+                        <div class="metric-pill">📊 ${result.sampleCount} samples</div>
+                        <div class="metric-pill">🔤 ${result.totalWords} total words</div>
+                    `;
+                    
+                    document.getElementById('voiceProfile').textContent = result.voiceProfile;
+                    document.getElementById('analysisResults').classList.add('show');
+                    document.getElementById('generateBtn').disabled = false;
+                    
+                    btn.textContent = '✅ Voice Analyzed!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                } else {
+                    alert('❌ Analysis failed: ' + result.errorMessage);
+                }
+            } catch (error) {
+                alert('💥 Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                if (btn.textContent.includes('Analyzing')) {
+                    btn.textContent = originalText;
+                }
+            }
+        });
+        
+        document.getElementById('generationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const topic = document.getElementById('topic').value.trim();
+            const contentType = document.getElementById('contentType').value;
+            
+            if (!topic) {
+                alert('💭 Please tell me what you want to write about!');
+                return;
+            }
+            
+            const btn = e.target.querySelector('button');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '🎨 Creating magic...';
+            btn.classList.add('loading');
+            
+            try {
+                const response = await fetch('/api/voice/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        topic: topic,
+                        contentType: contentType,
+                        voiceProfile: currentVoiceProfile
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('generatedContent').textContent = result.content;
+                    document.getElementById('generationResults').classList.add('show');
+                    
+                    // Success animation
+                    btn.textContent = '🎉 Content Created!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                } else {
+                    alert('❌ Generation failed: ' + result.content);
+                }
+            } catch (error) {
+                alert('💥 Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                if (btn.textContent.includes('Creating')) {
+                    btn.textContent = originalText;
+                }
+            }
+        });
+        
+        function copyToClipboard() {
+            const content = document.getElementById('generatedContent').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                btn.style.background = 'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)';
+                }, 1500);
+            });
+        }
+        
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-10px) scale(1.02) rotateX(5deg)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1) rotateX(0deg)';
+            });
+        });
+    </script>
+</body>
+</html>
